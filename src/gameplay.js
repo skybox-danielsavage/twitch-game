@@ -68,35 +68,37 @@ Player.prototype.update = function() {
     this.body.velocity.y = -200;
   }
 
-  if (throwKeyDown && this.wasThrowKeyDown === false) {
-    if (this.carrying === null) {
-      for (var i = 0; i < this.throwObjects.children.length; i++) {
-        var to = this.throwObjects.children[i];
+  if (this.index !== 0) {
+    if (throwKeyDown && this.wasThrowKeyDown === false) {
+      if (this.carrying === null) {
+        for (var i = 0; i < this.throwObjects.children.length; i++) {
+          var to = this.throwObjects.children[i];
 
-        if (this.position.distance(to) < this.width / 2 && to.body.onFloor()) {
-          //to.body.velocity.y = -200;
-          this.carrying = to;
-          to.body.allowGravity = false;
-          to.immovable = true;
-          this.addChild(to);
-          to.x = 0;
-          to.y = -16;
-          break;
+          if (this.position.distance(to) < this.width / 2 && to.body.onFloor()) {
+            //to.body.velocity.y = -200;
+            this.carrying = to;
+            to.body.allowGravity = false;
+            to.immovable = true;
+            this.addChild(to);
+            to.x = 0;
+            to.y = -16;
+            break;
+          }
         }
+      } else {
+        this.throwObjects.addChild(this.carrying);
+        this.carrying.body.allowGravity = true;
+        this.carrying.body.immovable = false;
+        this.carrying.body.velocity.set(this.facingRight ? 100 : -100, -200);
+        this.carrying.x = this.x;
+        this.carrying.y = this.y - 16;
+        this.carrying = null;
       }
-    } else {
-      this.throwObjects.addChild(this.carrying);
-      this.carrying.body.allowGravity = true;
-      this.carrying.body.immovable = false;
-      this.carrying.body.velocity.set(this.facingRight ? 100 : -100, -200);
-      this.carrying.x = this.x;
-      this.carrying.y = this.y - 16;
-      this.carrying = null;
-    }
 
-    this.wasThrowKeyDown = true;
-  } else if (throwKeyDown === false && this.wasThrowKeyDown === true) {
-    this.wasThrowKeyDown = false;
+      this.wasThrowKeyDown = true;
+    } else if (throwKeyDown === false && this.wasThrowKeyDown === true) {
+      this.wasThrowKeyDown = false;
+    }
   }
 };
 
@@ -154,6 +156,13 @@ Gameplay.prototype.create = function() {
 Gameplay.prototype.update = function () {
   this.game.physics.arcade.collide(this.foreground, this.players);
   this.game.physics.arcade.collide(this.foreground, this.throwObjects);
+
+  this.game.physics.arcade.overlap(this.players[0], this.throwObjects, function (shoppingCartPlayer, throwObject) {
+    if (throwObject.body.onFloor()) { return; }
+
+    throwObject.kill();
+  }, undefined, this);
+
 };
 Gameplay.prototype.shutdown = function () {
   this.player = null;
