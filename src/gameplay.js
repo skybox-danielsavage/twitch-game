@@ -10,6 +10,18 @@ var PlayerKeyInputCodes = [
     left: Phaser.KeyCode.A,
     jump: Phaser.KeyCode.W,
     throw: Phaser.KeyCode.S
+  },
+  {
+    right: Phaser.KeyCode.L,
+    left: Phaser.KeyCode.J,
+    jump: Phaser.KeyCode.I,
+    throw: Phaser.KeyCode.K
+  },
+  {
+    right: Phaser.KeyCode.NUMPAD_6,
+    left: Phaser.KeyCode.NUMPAD_4,
+    jump: Phaser.KeyCode.NUMPAD_8,
+    throw: Phaser.KeyCode.NUMPAD_5
   }
 ];
 
@@ -39,6 +51,8 @@ var Player = function (game, index, x, y, throwObjects) {
   this.facingRight = true;
 
   this.wasThrowKeyDown = false;
+
+  if (index === 0) { this.width = 24; }
 
   this.game.physics.enable(this, Phaser.Physics.ARCADE);
 
@@ -105,6 +119,8 @@ Player.prototype.update = function() {
 var Gameplay = function () {
   this.player = null;
   this.player2 = null;
+  this.player3 = null;
+  this.player4 = null;
   this.players = [];
 
   this.throwObjects = null;
@@ -143,7 +159,9 @@ Gameplay.prototype.create = function() {
 
   this.player = new Player(this.game, 0, 100, 10, this.throwObjects);
   this.player2 = new Player(this.game, 1, 50, 10, this.throwObjects);
-  this.players = [this.player, this.player2];
+  this.player3 = new Player(this.game, 2, 50, 10, this.throwObjects);
+  this.player4 = new Player(this.game, 3, 50, 10, this.throwObjects);
+  this.players = [this.player, this.player2, this.player3, this.player4];
 
   for (var i = 0; i < 5; i++) {
     var to = new ThrowObject(this.game, 25 + 50 * i, 25);
@@ -167,6 +185,8 @@ Gameplay.prototype.update = function () {
 Gameplay.prototype.shutdown = function () {
   this.player = null;
   this.player2 = null;
+  this.player3 = null;
+  this.player4 = null;
   this.players = null;
 
   this.throwObjects = null;
