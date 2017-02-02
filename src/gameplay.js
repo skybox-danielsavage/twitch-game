@@ -157,14 +157,14 @@ Gameplay.prototype.create = function() {
 
   this.throwObjects = this.game.add.group();
 
-  this.player = new Player(this.game, 0, 100, 10, this.throwObjects);
-  this.player2 = new Player(this.game, 1, 50, 10, this.throwObjects);
-  this.player3 = new Player(this.game, 2, 50, 10, this.throwObjects);
-  this.player4 = new Player(this.game, 3, 50, 10, this.throwObjects);
+  this.player = new Player(this.game, 0, 240, 10, this.throwObjects);
+  this.player2 = new Player(this.game, 1, 48, 10, this.throwObjects);
+  this.player3 = new Player(this.game, 2, 64, 10, this.throwObjects);
+  this.player4 = new Player(this.game, 3, 96, 10, this.throwObjects);
   this.players = [this.player, this.player2, this.player3, this.player4];
 
   for (var i = 0; i < 5; i++) {
-    var to = new ThrowObject(this.game, 25 + 50 * i, 25);
+    var to = new ThrowObject(this.game, 25 + 100 * i, 25);
     this.throwObjects.addChild(to);
     this.throwObjects.addToHash(to);
   }
