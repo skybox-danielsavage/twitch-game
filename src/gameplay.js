@@ -170,10 +170,10 @@ Gameplay.prototype.create = function() {
 
   this.gameLogic = new GameLogic(this.game);
 
-  this.player = new Player(this.game, 0, 240, 10, this.throwObjects);
-  this.player2 = new Player(this.game, 1, 48, 10, this.throwObjects);
-  this.player3 = new Player(this.game, 2, 64, 10, this.throwObjects);
-  this.player4 = new Player(this.game, 3, 96, 10, this.throwObjects);
+  this.player = new Player(this.game, 0,  this.game.width / 2, this.game.height / 2, this.throwObjects);
+  this.player2 = new Player(this.game, 1, this.game.width / 2, this.game.height / 2, this.throwObjects);
+  this.player3 = new Player(this.game, 2, this.game.width / 2, this.game.height / 2, this.throwObjects);
+  this.player4 = new Player(this.game, 3, this.game.width / 2, this.game.height / 2, this.throwObjects);
   this.players = [this.player, this.player2, this.player3, this.player4];
   this.game.camera.follow(this.players[0]);
 

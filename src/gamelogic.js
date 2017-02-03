@@ -31,6 +31,8 @@ GameLogic.prototype.startGame = function () {
 
 		if (this.secondsLeft === 0) {
 			this.gameTickerEvent = null;
+
+			this.game.state.start('Gameplay');
 		}
 	}, this);
 }
