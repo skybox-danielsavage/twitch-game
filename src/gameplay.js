@@ -1,3 +1,12 @@
+// GOALS FOR TODAY:
+//
+// Zach: get a prototype player sprite going :)
+//       some simple animations too
+//       variations, too!
+// 
+// Daniel: Create a "game state", describing what the players
+//         need to do. (timer, items, etc.)
+
 var PlayerKeyInputCodes = [
   {
     right: Phaser.KeyCode.RIGHT,
@@ -123,6 +132,8 @@ var Gameplay = function () {
   this.player4 = null;
   this.players = [];
 
+  this.gameLogic = null;
+
   this.throwObjects = null;
 };
 Gameplay.prototype.init = function() {
@@ -157,19 +168,38 @@ Gameplay.prototype.create = function() {
 
   this.throwObjects = this.game.add.group();
 
+  this.gameLogic = new GameLogic(this.game);
+
   this.player = new Player(this.game, 0, 240, 10, this.throwObjects);
   this.player2 = new Player(this.game, 1, 48, 10, this.throwObjects);
   this.player3 = new Player(this.game, 2, 64, 10, this.throwObjects);
   this.player4 = new Player(this.game, 3, 96, 10, this.throwObjects);
   this.players = [this.player, this.player2, this.player3, this.player4];
+  this.game.camera.follow(this.players[0]);
 
-  for (var i = 0; i < 5; i++) {
-    var to = new ThrowObject(this.game, 25 + 100 * i, 25);
-    this.throwObjects.addChild(to);
-    this.throwObjects.addToHash(to);
+  this.ui = this.game.add.group();
+  this.ui.fixedToCamera = true;
+  this.ui.timerText = this.game.add.bitmapText(16, 16, 'font','GET READY!!', 8);
+  this.ui.addChild(this.ui.timerText);
+  this.ui.shoppingItems = [];
+  for (var i = 0; i < 10; i++) {
+    var newShoppingItem = this.game.add.bitmapText(this.game.width - 32, 32 + 16 * i, 'font', 'foo', 8);
+    this.ui.addChild(newShoppingItem);
+    this.ui.shoppingItems.push(newShoppingItem);
+    newShoppingItem.align = 'right';
+    newShoppingItem.anchor.x = 1;
   }
 
-  this.game.camera.follow(this.players[0]);
+  this.gameLogic.startGame();
+  for (var i = 0; i < this.gameLogic.shoppingList.length; i++) {
+    var to = new ThrowObject(this.game, 200 + 100 * i, 25);
+    this.throwObjects.addChild(to);
+    this.throwObjects.addToHash(to);
+
+    var label = this.game.add.bitmapText(8, -16, 'font', this.gameLogic.shoppingList[i], 8);
+    to.addChild(label);
+    to.textLabel = this.gameLogic.shoppingList[i];
+  }
 };
 Gameplay.prototype.update = function () {
   this.game.physics.arcade.collide(this.foreground, this.players);
@@ -179,8 +209,19 @@ Gameplay.prototype.update = function () {
     if (throwObject.body.onFloor()) { return; }
 
     throwObject.kill();
+    var v = this.gameLogic.shoppingList.indexOf(throwObject.textLabel);
+    console.log(v);
+    this.gameLogic.shoppingList.splice(v, 1);
   }, undefined, this);
 
+  this.ui.timerText.text = this.gameLogic.secondsLeft + ' seconds left!!';
+  for (var i = 0; i < this.ui.shoppingItems.length; i++) {
+    if (i < this.gameLogic.shoppingList.length) {
+      this.ui.shoppingItems[i].text = this.gameLogic.shoppingList[i];
+    } else {
+      this.ui.shoppingItems[i].text = '';
+    }
+  }
 };
 Gameplay.prototype.shutdown = function () {
   this.player = null;
