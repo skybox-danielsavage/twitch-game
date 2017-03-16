@@ -1,3 +1,11 @@
+var ShoppingList = function (items) {
+  this.shoppingItems = items;
+};
+ShoppingList.prototype.getItems = function() {
+  return this.shoppingItems;
+};
+
+
 var PlayerKeyInputCodes = [
   {
     right: Phaser.KeyCode.RIGHT,
@@ -135,6 +143,21 @@ Gameplay.prototype.create = function() {
   // closure context
   var that = this;
 
+  this.shoppingList = new ShoppingList(['apple', 'eggs', 'milk', 'cabbage', 'television', 'toilet paper']);
+
+  this.ui = this.game.add.group();
+  this.ui.fixedToCamera = true;
+  this.ui.shoppingListView = this.game.add.group();
+  this.ui.shoppingListView.x = 8;
+  this.ui.shoppingListView.y = 8;
+  this.ui.addChild(this.ui.shoppingListView);
+  for (var i = 0; i < this.shoppingList.getItems().length; i++) {
+    var text = this.game.add.bitmapText(0, i * 10, 'font', this.shoppingList.getItems()[i], 8);
+    this.ui.shoppingListView.addChild(text);
+  }
+  //this.ui.dummyText = this.game.add.bitmapText(16, 16, 'font', 'hello, world!', 8);
+  //this.ui.addChild(this.ui.dummyText);
+
   // add key captures
   this.game.input.keyboard.addKeyCapture(Phaser.KeyCode.RIGHT);
   this.game.input.keyboard.addKeyCapture(Phaser.KeyCode.LEFT);
@@ -164,8 +187,8 @@ Gameplay.prototype.create = function() {
   this.players = [this.player, this.player2, this.player3, this.player4];
 
   this.effectEmitter = this.game.add.emitter(0, 0, 30);
-  this.effectEmitter.makeParticles('test16x16', 2);
   this.effectEmitter.gravity = 0;
+  this.effectEmitter.makeParticles('test16x16', 2);
   this.effectEmitter.lifespan = 1000;
   this.effectEmitter.maxRotation = 0;
   this.effectEmitter.minRotation = 0;
@@ -176,6 +199,8 @@ Gameplay.prototype.create = function() {
     this.throwObjects.addChild(to);
     this.throwObjects.addToHash(to);
   }
+
+  this.game.world.bringToTop(this.ui);
 
   this.game.camera.follow(this.players[0]);
 };
