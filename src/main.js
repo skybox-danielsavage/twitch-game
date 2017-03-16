@@ -39,7 +39,7 @@ Preload.prototype.create = function() {
 };
 
 var main = function () {
-	console.log('hello, jam! 😊');
+	console.log('hi, jam! 😊');
 
 	var game = new Phaser.Game(320, 240);
 	game.state.add('Gameplay', Gameplay, false);
