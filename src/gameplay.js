@@ -44,7 +44,7 @@ ThrowObject.prototype.update = function () {
 };
 
 var Player = function (game, index, x, y, throwObjects) {
-  Phaser.Sprite.call(this, game, x, y, 'test16x16', 3 + index);
+  Phaser.Sprite.call(this, game, x, y, 'test16x16', 4 + index);
   this.index = index;
   this.throwObjects = throwObjects;
   this.carrying = null;
@@ -55,6 +55,10 @@ var Player = function (game, index, x, y, throwObjects) {
   this.game.physics.enable(this, Phaser.Physics.ARCADE);
 
   this.walkSpeed = 100;
+
+  if (this.index === 0) {
+    this.width = 32;
+  }
 
   this.game.add.existing(this);
 };
@@ -80,7 +84,7 @@ Player.prototype.update = function() {
     this.body.velocity.y = -200;
   }
 
-  if (throwKeyDown && this.wasThrowKeyDown === false) {
+  if (throwKeyDown && this.wasThrowKeyDown === false && this.index !== 0) {
     if (this.carrying === null) {
       for (var i = 0; i < this.throwObjects.children.length; i++) {
         var to = this.throwObjects.children[i];
@@ -115,6 +119,8 @@ Player.prototype.update = function() {
 var Gameplay = function () {
   this.player = null;
   this.player2 = null;
+  this.player3 = null;
+  this.player4 = null;
   this.players = [];
 
   this.throwObjects = null;
@@ -151,13 +157,21 @@ Gameplay.prototype.create = function() {
 
   this.throwObjects = this.game.add.group();
 
-  this.player = new Player(this.game, 0, 100, 10, this.throwObjects);
+  this.player = new Player(this.game, 0, 220, 10, this.throwObjects);
   this.player2 = new Player(this.game, 1, 69, 10, this.throwObjects);
   this.player3 = new Player(this.game, 2, 70, 10, this.throwObjects);
   this.player4 = new Player(this.game, 3, 50, 10, this.throwObjects);
   this.players = [this.player, this.player2, this.player3, this.player4];
 
-  for (var i = 0; i < 5; i++) {
+  this.effectEmitter = this.game.add.emitter(0, 0, 30);
+  this.effectEmitter.makeParticles('test16x16', 2);
+  this.effectEmitter.gravity = 0;
+  this.effectEmitter.lifespan = 1000;
+  this.effectEmitter.maxRotation = 0;
+  this.effectEmitter.minRotation = 0;
+  this.effectEmitter.setScale(0.20, 0.25, 0.20, 0.25)
+
+  for (var i = 0; i < 4; i++) {
     var to = new ThrowObject(this.game, 25 + 50 * i, 25);
     this.throwObjects.addChild(to);
     this.throwObjects.addToHash(to);
@@ -168,6 +182,17 @@ Gameplay.prototype.create = function() {
 Gameplay.prototype.update = function () {
   this.game.physics.arcade.collide(this.foreground, this.players);
   this.game.physics.arcade.collide(this.foreground, this.throwObjects);
+
+  this.game.physics.arcade.overlap(this.throwObjects, this.players, function (player, throwObject) {
+    throwObject.kill();
+
+    for (var i = 0; i < 10; i++) {
+      this.effectEmitter.emitParticle(this.player.centerX, this.player.y - this.player.height / 5);
+    }
+  }, function (player, throwObject) {
+    return (player.index === 0 && (throwObject.body.velocity.y > 2));
+  }, this);
+
 };
 Gameplay.prototype.shutdown = function () {
   this.player = null;
